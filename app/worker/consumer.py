@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.core.rabbitmq import RABBITMQ_URL, QUEUE_NAME
-from app.models.domain import Job, JobStatus
+from app.models.domain import Job, JobStatus, HockeyTeam
+from app.worker.crawlers.hockey import scrape_hockey_teams
 
 logging.basicConfig(
     level=logging.INFO,
@@ -37,10 +38,18 @@ async def process_message(message: IncomingMessage) -> None:
             
             job.status = JobStatus.RUNNING
             db.commit()
-            logger.info(f"Job {job_id} is now RUNNING")
 
-            logger.info(f"Simulating scraping for {target}... (takes 5 seconds)")
-            await asyncio.sleep(5) 
+            if target in ["hockey", "all"]:
+                logger.info("Scraping hockey data...")
+                hockey_data = await asyncio.to_thread(scrape_hockey_teams)
+                
+                hockey_records = [HockeyTeam(job_id=job_id, **item) for item in hockey_data]
+                db.bulk_save_objects(hockey_records)
+                logger.info(f"Saved {len(hockey_records)} hockey records to DB.")
+
+            if target in ["oscar", "all"]:
+                # TODO: Integrar o scraper do Oscar depois
+                pass
 
             job.status = JobStatus.COMPLETED
             db.commit()
@@ -63,15 +72,11 @@ async def main() -> None:
     
     async with connection:
         channel = await connection.channel()
-        
         await channel.set_qos(prefetch_count=1)
-        
         queue = await channel.declare_queue(QUEUE_NAME, durable=True)
         
         logger.info("Worker started. Waiting for messages...")
-        
         await queue.consume(process_message)
-        
         await asyncio.Future()
 
 if __name__ == "__main__":

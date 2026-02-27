@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # ----------------------------------------
   # PostgreSQL - Banco de Dados
@@ -40,6 +38,17 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  # ----------------------------------------
+  # Selenium - Navegador Headless
+  # ----------------------------------------
+  selenium:
+    image: selenium/standalone-chrome:latest
+    container_name: rpa_selenium
+    shm_size: 2gb
+    ports:
+      - "4444:4444"
+      - "7900:7900"
 
 volumes:
   postgres_data:

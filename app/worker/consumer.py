@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.core.rabbitmq import RABBITMQ_URL, QUEUE_NAME
-from app.models.domain import Job, JobStatus, HockeyTeam
+from app.models.domain import Job, JobStatus, HockeyTeam, OscarFilm
 from app.worker.crawlers.hockey import scrape_hockey_teams
+from app.worker.crawlers.oscar import scrape_oscar_films
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,8 +49,12 @@ async def process_message(message: IncomingMessage) -> None:
                 logger.info(f"Saved {len(hockey_records)} hockey records to DB.")
 
             if target in ["oscar", "all"]:
-                # TODO: Integrar o scraper do Oscar depois
-                pass
+                logger.info("Scraping oscar data...")
+                oscar_data = await asyncio.to_thread(scrape_oscar_films)
+                
+                oscar_records = [OscarFilm(job_id=job_id, **item) for item in oscar_data]
+                db.bulk_save_objects(oscar_records)
+                logger.info(f"Saved {len(oscar_records)} oscar records to DB.")
 
             job.status = JobStatus.COMPLETED
             db.commit()

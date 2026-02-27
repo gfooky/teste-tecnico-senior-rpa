@@ -1,5 +1,42 @@
 services:
   # ----------------------------------------
+  # API - FastAPI
+  # ----------------------------------------
+  api:
+    build: .
+    container_name: rpa_api
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://rpa_user:rpa_password@db:5432/rpa_db
+      - RABBITMQ_URL=amqp://rpa_user:rpa_password@rabbitmq:5672/
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  # ----------------------------------------
+  # Worker - Consumidor RabbitMQ
+  # ----------------------------------------
+  worker:
+    build: .
+    container_name: rpa_worker
+    command: python -m app.worker.consumer
+    environment:
+      - DATABASE_URL=postgresql://rpa_user:rpa_password@db:5432/rpa_db
+      - RABBITMQ_URL=amqp://rpa_user:rpa_password@rabbitmq:5672/
+      - SELENIUM_URL=http://selenium:4444/wd/hub
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      selenium:
+        condition: service_started
+
+  # ----------------------------------------
   # PostgreSQL - Banco de Dados
   # ----------------------------------------
   db:

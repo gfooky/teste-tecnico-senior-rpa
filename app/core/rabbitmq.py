@@ -1,9 +1,13 @@
+import os
 import json
 from uuid import UUID
 from aio_pika import connect_robust, Message, DeliveryMode
 
 # TODO: Mover para variáveis de ambiente (ex: pydantic-settings)
-RABBITMQ_URL = "amqp://rpa_user:rpa_password@localhost:5672/"
+RABBITMQ_URL = os.getenv(
+    "RABBITMQ_URL", 
+    "amqp://rpa_user:rpa_password@localhost:5672/"
+)
 QUEUE_NAME = "scraper_tasks"
 
 

@@ -1,3 +1,4 @@
+import os
 from collections.abc import Generator
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -5,7 +6,11 @@ from sqlalchemy.orm import sessionmaker, Session
 from app.models.domain import Base
 
 # TODO: Mover para variáveis de ambiente usando pydantic-settings
-SQLALCHEMY_DATABASE_URL = "postgresql://rpa_user:rpa_password@localhost:5432/rpa_db"
+
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "postgresql://rpa_user:rpa_password@localhost:5432/rpa_db"
+)
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 

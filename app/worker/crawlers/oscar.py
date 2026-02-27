@@ -1,4 +1,5 @@
 import time
+import os
 from typing import List, Dict, Any
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -21,7 +22,10 @@ def scrape_oscar_films() -> List[Dict[str, Any]]:
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     
-    SELENIUM_URL = "http://localhost:4444/wd/hub"
+    SELENIUM_URL = os.getenv(
+        "SELENIUM_URL", 
+        "http://localhost:4444/wd/hub"
+    )
     
     driver = webdriver.Remote(
         command_executor=SELENIUM_URL,

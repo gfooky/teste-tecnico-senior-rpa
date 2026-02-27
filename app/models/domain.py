@@ -7,7 +7,7 @@ from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
-# Enumeração para o status do Job
+# Job status enum
 class JobStatus(str, enum.Enum):
     PENDING = "pending"
     RUNNING = "running"
@@ -18,12 +18,12 @@ class Job(Base):
     __tablename__ = "jobs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    target = Column(String, nullable=False) # 'hockey', 'oscar' ou 'all'
+    target = Column(String, nullable=False) # 'hockey', 'oscar' or 'all'
     status = Column(Enum(JobStatus), default=JobStatus.PENDING, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relacionamentos para facilitar a busca dos resultados depois
+    # Relationships to search for results
     hockey_results = relationship("HockeyTeam", back_populates="job")
     oscar_results = relationship("OscarFilm", back_populates="job")
 

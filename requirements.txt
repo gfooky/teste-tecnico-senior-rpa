@@ -1,5 +1,5 @@
 # ==========================================
-# Framework Web e Validação
+# Web Framework and Validation
 # ==========================================
 fastapi==0.110.0
 uvicorn==0.27.1
@@ -7,13 +7,13 @@ pydantic==2.6.3
 pydantic-settings==2.2.1
 
 # ==========================================
-# Banco de Dados (ORM e Drivers)
+# Database (ORM and Drivers)
 # ==========================================
 sqlalchemy==2.0.27
 psycopg2-binary==2.9.9 
 
 # ==========================================
-# Mensageria (RabbitMQ)
+# Messaging (RabbitMQ)
 # ==========================================
 aio-pika==9.4.0 
 
@@ -26,7 +26,7 @@ selenium==4.18.1
 webdriver-manager==4.0.1 
 
 # ==========================================
-# Testes, Qualidade de Código e CI/CD
+# Tests, Code Quality and CI/CD
 # ==========================================
 pytest==8.0.2
 pytest-asyncio==0.23.5
